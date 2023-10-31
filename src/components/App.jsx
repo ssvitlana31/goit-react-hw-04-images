@@ -29,8 +29,8 @@ export const App = () => {
       return;
     }
     const newFetch = async () => {
+      setLoading(true);
       try {
-        setLoading(true);
         const data = await fetchImages({ page, per_page, q: q });
 
         if (!data.totalHits) {
@@ -93,7 +93,7 @@ export const App = () => {
   };
 
   const handleToggleModal = () => {
-    setIsModalOpen(!prev);
+    setIsModalOpen();
     setImageURL(imaageURL);
     // this.setState(prevState => ({
     //   isModalOpen: !prevState.isModalOpen,
@@ -115,7 +115,7 @@ export const App = () => {
         <Searchbar
           onSearchInput={handleSearchInput}
           handleSubmit={handleSubmit}
-          query={query}
+          query={q}
         />
       </header>
       {loading && !images ? (
