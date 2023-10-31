@@ -1,56 +1,52 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import PropTypes from 'prop-types';
 import styled from 'styled-components';
 
-export class Modal extends React.Component {
-  static propTypes = {
-    handleToggleModal: PropTypes.func.isRequired,
-    largeImageURL: PropTypes.string.isRequired,
-  };
+export const Modal = ({ handleToggleModal, children }) => {
+  useEffect(() => {
+    const handleKeyDown = e => {
+      if (e.key === 'Escape') {
+        handleToggleModal();
+      }
+    };
 
-  componentDidMount() {
-    document.addEventListener('keydown', this.handleKeyDown);
-  }
-
-  componentWillUnmount() {
-    document.removeEventListener('keydown', this.handleKeyDown);
-  }
+    window.addEventListener('keydown', handleKeyDown);
+    return () => {
+      window.removeEventListener('keydown', handleKeyDown);
+    };
+  }, [handleToggleModal]);
 
   onBackdropClick = e => {
     if (e.target === e.currentTarget) {
-      this.props.handleToggleModal();
+      handleToggleModal();
     }
   };
 
-  handleKeyDown = e => {
-    if (e.key === 'Escape') {
-      this.props.handleToggleModal();
-    }
-  };
+  return (
+    <ModalWrapper onClick={onBackdropClick}>
+      <StyledModalWindow>
+        <StyledWrapper>
+          <button onClick={handleToggleModal}>X</button>
 
-  render() {
-    const { largeImageURL, handleToggleModal } = this.props;
-    return (
-      <ModalWrapper onClick={this.onBackdropClick}>
-        <StyledModalWindow>
-          <StyledWrapper>
-            <button onClick={handleToggleModal}>X</button>
+          <div>
+            {' '}
+            <StyledImage
+              src={largeImageURL}
+              alt="Img pixabay"
+              width={800}
+              height={700}
+            />
+          </div>
+        </StyledWrapper>
+      </StyledModalWindow>
+    </ModalWrapper>
+  );
+};
 
-            <div>
-              {' '}
-              <StyledImage
-                src={largeImageURL}
-                alt="Img pixabay"
-                width={800}
-                height={700}
-              />
-            </div>
-          </StyledWrapper>
-        </StyledModalWindow>
-      </ModalWrapper>
-    );
-  }
-}
+Modal.propTypes = {
+  handleToggleModal: PropTypes.func.isRequired,
+  largeImageURL: PropTypes.string.isRequired,
+};
 
 const ModalWrapper = styled.div`
   width: 100vw;

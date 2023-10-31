@@ -1,4 +1,6 @@
-import React, { Component } from 'react';
+import { useEffect } from 'react';
+import { useState } from 'react';
+import { useRef } from 'react';
 import { toast } from 'react-toastify';
 import { fetchImages } from 'services/api';
 import { ImageGallery } from './ImageGallery';
@@ -7,108 +9,126 @@ import { Loader } from './Loader';
 import { Searchbar } from './Searchbar';
 import { Modal } from './Modal';
 
-export class App extends Component {
-  state = {
-    loading: false,
-    error: null,
-    images: [],
-    page: 1,
-    per_page: 12,
-    q: '',
-    totalHits: 0,
-    isModalOpen: false,
-    total: '',
-    imageURL: null,
-  };
+export const App = () => {
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
+  const [images, setImages] = useState([]);
+  const [page, setPage] = useState(1);
+  const [per_page, setPer_page] = useState(12);
+  const [q, setQ] = useState('');
+  const [totalHits, setTotalHits] = useState(0);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [total, setTotal] = useState('');
+  const [imaageURL, setImageURL] = useState(null);
 
-  async componentDidUpdate(_, prevState) {
-    if (this.state.page !== prevState.page || this.state.q !== prevState.q) {
-      this.setState({ loading: true });
+  const firstLoadOf = useRef(true);
 
+  useEffect(() => {
+    if (firstLoadOf.current) {
+      firstLoadOf.current = false;
+      return;
+    }
+    const newFetch = async () => {
       try {
-        const newImages = await fetchImages({
-          page: this.state.page,
-          q: this.state.q,
-          totalHits: this.state.totalHits,
-          per_page: this.state.per_page,
-        });
+        setLoading(true);
+        const data = await fetchImages({ page, per_page, q: q });
 
-        this.setState(prev => ({
-          images: [...prev.images, ...newImages.hits],
-          totalHits: newImages.totalHits,
-        }));
-      } catch (err) {
-        this.setState({ error: err.message }, () => {
-          toast.error(this.state.error);
-        });
+        if (!data.totalHits) {
+          toast.warn(
+            'Sorry, but nothing was found for your request. Change the request and try again.'
+          );
+          return;
+        }
+        setImages(prevImages =>
+          page === 1 ? data.hits : [...prevImages, ...data.hits]
+        );
+      } catch (error) {
+        toast.error('Oops!!! An error occurred. Please try again.');
       } finally {
-        this.setState({ loading: false });
+        setLoading(false);
       }
-    }
-  }
+    };
+    newFetch();
+  }, [q, page, per_page]);
 
-  handleSearchInput = q => {
-    if (this.state.q !== q) {
-      this.setState({ q, images: [], page: 1 });
+  // async componentDidUpdate(_, prevState) {
+  //   if (this.state.page !== prevState.page || this.state.q !== prevState.q) {
+  //     this.setState({ loading: true });
+
+  //     try {
+  //       const newImages = await fetchImages({
+  //         page: this.state.page,
+  //         q: this.state.q,
+  //         totalHits: this.state.totalHits,
+  //         per_page: this.state.per_page,
+  //       });
+
+  //       this.setState(prev => ({
+  //         images: [...prev.images, ...newImages.hits],
+  //         totalHits: newImages.totalHits,
+  //       }));
+  //     } catch (err) {
+  //
+  //       });
+  //     } finally {
+  //       this.setState({ loading: false });
+  //     }
+  //   }
+  // }
+
+  const handleSearchInput = q => {
+    if (q !== q) {
+      setQ(q), setImages([]), setPage(1);
     }
   };
 
-  handleSubmit = async () => {
-    this.setState({ images: [], page: 1, totalHits: 0 });
+  const handleSubmit = () => {
+    setImages([]), setPage(1), setTotalHits(0);
+    // this.setState({ images: [], page: 1, totalHits: 0 });
   };
 
-  handleLoadMore = () => {
-    const { page, per_page, totalHits } = this.state;
+  const handleLoadMore = () => {
     const maxPages = Math.ceil(totalHits / per_page);
-    this.setState({
-      page: page < maxPages ? page + 1 : page,
-    });
+    setPage(page < maxPages ? page + 1 : page);
   };
 
-  handleToggleModal = imageURL => {
-    this.setState(prevState => ({
-      isModalOpen: !prevState.isModalOpen,
-      imageURL: imageURL,
-    }));
+  const handleToggleModal = () => {
+    setIsModalOpen(!prev);
+    setImageURL(imaageURL);
+    // this.setState(prevState => ({
+    //   isModalOpen: !prevState.isModalOpen,
+    //   imageURL: imageURL,
+    // }));
   };
 
-  render() {
-    const { images, loading, imageURL, isModalOpen, totalHits } = this.state;
-    return (
-      <div
-        style={{
-          display: 'flex',
-          flexDirection: 'column',
-          alignItems: 'center',
-          fontSize: 18,
-          color: `#000000`,
-        }}
-      >
-        <header>
-          <Searchbar
-            onSearchInput={this.handleSearchInput}
-            handleSubmit={this.handleSubmit}
-            query={this.state.query}
-          />
-        </header>
-        {loading && !images ? (
-          <Loader />
-        ) : (
-          <ImageGallery
-            handleToggleModal={this.handleToggleModal}
-            images={images}
-          />
-        )}
-        {totalHits > images.length ? (
-          <Button onClick={this.handleLoadMore} loading={loading} />
-        ) : null}
-        {isModalOpen ? (
-          <Modal
-            handleToggleModal={this.handleToggleModal}
-            largeImageURL={imageURL}
-          />
-        ) : null}
-      </div>
-    );
-  }
-}
+  return (
+    <div
+      style={{
+        display: 'flex',
+        flexDirection: 'column',
+        alignItems: 'center',
+        fontSize: 18,
+        color: `#000000`,
+      }}
+    >
+      <header>
+        <Searchbar
+          onSearchInput={handleSearchInput}
+          handleSubmit={handleSubmit}
+          query={query}
+        />
+      </header>
+      {loading && !images ? (
+        <Loader />
+      ) : (
+        <ImageGallery handleToggleModal={handleToggleModal} images={images} />
+      )}
+      {totalHits > images.length ? (
+        <Button onClick={handleLoadMore} loading={loading} />
+      ) : null}
+      {isModalOpen ? (
+        <Modal handleToggleModal={handleToggleModal} largeImageURL={imageURL} />
+      ) : null}
+    </div>
+  );
+};
