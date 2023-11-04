@@ -16,7 +16,7 @@ export const Modal = ({ handleToggleModal, children }) => {
     };
   }, [handleToggleModal]);
 
-  onBackdropClick = e => {
+  const onBackdropClick = e => {
     if (e.target === e.currentTarget) {
       handleToggleModal();
     }
@@ -31,7 +31,7 @@ export const Modal = ({ handleToggleModal, children }) => {
           <div>
             {' '}
             <StyledImage
-              src={largeImageURL}
+              src={ImageURL}
               alt="Img pixabay"
               width={800}
               height={700}

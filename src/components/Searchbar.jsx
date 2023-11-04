@@ -1,53 +1,42 @@
-import React from 'react';
+import React, { useState } from 'react';
 import PropTypes from 'prop-types';
 import styled from 'styled-components';
 import { StyledButton } from './Button';
 
-export class Searchbar extends React.Component {
-  static propTypes = {
-    onSearchInput: PropTypes.func.isRequired,
-    handleSubmit: PropTypes.func.isRequired,
+export const Searchbar = ({ onSubmit }) => {
+  const [query, setQuery] = useState(''),
+    handleFormSubmit = e => {
+      e.preventDefault();
+      onSubmit(query);
+    };
+
+  const handleInputChange = ({ target: { value } }) => {
+    setQuery(value);
   };
 
-  state = {
-    inputValue: '',
-  };
+  return (
+    <header>
+      <StyledForm onSubmit={onSubmit}>
+        <StyledInput
+          type="text"
+          autoComplete="off"
+          autoFocus
+          name="query"
+          placeholder="Search images and photos"
+          onChange={handleInputChange}
+        />
+        <StyledButtonSearch onClick={handleFormSubmit} type="submit">
+          Search
+        </StyledButtonSearch>
+      </StyledForm>
+    </header>
+  );
+};
 
-  onSubmit = e => {
-    e.preventDefault();
-    this.props.onSearchInput(this.state.inputValue);
-  };
-
-  handleInputCheange = ({ target }) => {
-    this.setState({ inputValue: target.value });
-  };
-
-  render() {
-    const disabled = !this.state.inputValue.length;
-    return (
-      <header>
-        <StyledForm onSubmit={this.onSubmit}>
-          <StyledInput
-            type="text"
-            autoComplete="off"
-            autoFocus
-            name="query"
-            placeholder="Search images and photos"
-            onChange={this.handleInputCheange}
-          />
-          <StyledButtonSearch
-            onClick={this.handleSubmit}
-            type="submit"
-            disabled={disabled}
-            className={disabled && 'disabled'}
-          >
-            Search
-          </StyledButtonSearch>
-        </StyledForm>
-      </header>
-    );
-  }
-}
+Searchbar.propTypes = {
+  onSearchInput: PropTypes.func.isRequired,
+  onSubmit: PropTypes.func.isRequired,
+};
 
 const StyledForm = styled.form`
   display: flex;

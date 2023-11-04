@@ -113,9 +113,7 @@ export const App = () => {
     >
       <header>
         <Searchbar
-          onSearchInput={handleSearchInput}
-          handleSubmit={handleSubmit}
-          query={q}
+         onSubmit={handleSearchInput}
         />
       </header>
       {loading && !images ? (
