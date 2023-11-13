@@ -15,11 +15,11 @@ export const App = () => {
   const [images, setImages] = useState([]);
   const [page, setPage] = useState(1);
   const [per_page, setPer_page] = useState(12);
-  const [q, setQ] = useState('');
+  const [query, setQuery] = useState('');
   const [totalHits, setTotalHits] = useState(0);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [total, setTotal] = useState('');
-  const [imaageURL, setImageURL] = useState(null);
+  const [imageURL, setImageURL] = useState(null);
 
   const firstLoadOf = useRef(true);
 
@@ -28,17 +28,11 @@ export const App = () => {
       firstLoadOf.current = false;
       return;
     }
-    const newFetch = async () => {
+    const nextFetch = async () => {
       setLoading(true);
       try {
-        const data = await fetchImages({ page, per_page, q: q });
+        const data = await fetchImages({ page, per_page, q: query });
 
-        if (!data.totalHits) {
-          toast.warn(
-            'Sorry, but nothing was found for your request. Change the request and try again.'
-          );
-          return;
-        }
         setImages(prevImages =>
           page === 1 ? data.hits : [...prevImages, ...data.hits]
         );
@@ -48,57 +42,28 @@ export const App = () => {
         setLoading(false);
       }
     };
-    newFetch();
-  }, [q, page, per_page]);
-
-  // async componentDidUpdate(_, prevState) {
-  //   if (this.state.page !== prevState.page || this.state.q !== prevState.q) {
-  //     this.setState({ loading: true });
-
-  //     try {
-  //       const newImages = await fetchImages({
-  //         page: this.state.page,
-  //         q: this.state.q,
-  //         totalHits: this.state.totalHits,
-  //         per_page: this.state.per_page,
-  //       });
-
-  //       this.setState(prev => ({
-  //         images: [...prev.images, ...newImages.hits],
-  //         totalHits: newImages.totalHits,
-  //       }));
-  //     } catch (err) {
-  //
-  //       });
-  //     } finally {
-  //       this.setState({ loading: false });
-  //     }
-  //   }
-  // }
+    nextFetch();
+  }, [query, page, per_page]);
 
   const handleSearchInput = q => {
-    if (q !== q) {
-      setQ(q), setImages([]), setPage(1);
+    if (query !== q) {
+      setQuery(q);
+      setPage(1);
     }
   };
 
-  const handleSubmit = () => {
-    setImages([]), setPage(1), setTotalHits(0);
-    // this.setState({ images: [], page: 1, totalHits: 0 });
-  };
+  // const handleSubmit = () => {
+  //   setImages([]), setPage(1), setTotalHits(0);
+  //   // this.setState({ images: [], page: 1, totalHits: 0 });
+  // };
 
   const handleLoadMore = () => {
     const maxPages = Math.ceil(totalHits / per_page);
     setPage(page < maxPages ? page + 1 : page);
   };
 
-  const handleToggleModal = () => {
-    setIsModalOpen();
-    setImageURL(imaageURL);
-    // this.setState(prevState => ({
-    //   isModalOpen: !prevState.isModalOpen,
-    //   imageURL: imageURL,
-    // }));
+  const handleToggleModal = imageURL => {
+    setImageURL(imageURL ? imageURL : '');
   };
 
   return (
@@ -112,9 +77,7 @@ export const App = () => {
       }}
     >
       <header>
-        <Searchbar
-         onSubmit={handleSearchInput}
-        />
+        <Searchbar onSubmit={handleSearchInput} />
       </header>
       {loading && !images ? (
         <Loader />

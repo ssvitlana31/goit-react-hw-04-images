@@ -2,7 +2,7 @@ import React, { useEffect } from 'react';
 import PropTypes from 'prop-types';
 import styled from 'styled-components';
 
-export const Modal = ({ handleToggleModal, children }) => {
+export const Modal = ({ handleToggleModal, ImageURL }) => {
   useEffect(() => {
     const handleKeyDown = e => {
       if (e.key === 'Escape') {
