@@ -5,7 +5,7 @@ import styled from 'styled-components';
 export const Loader = () => {
   return (
     <LoaderContainer>
-      <InfinitySpin width="200" color="rgb(61, 106, 255)" />
+      <InfinitySpin width="200" color="rgb(43, 88, 236)" />
     </LoaderContainer>
   );
 };

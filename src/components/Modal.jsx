@@ -2,11 +2,11 @@ import React, { useEffect } from 'react';
 import PropTypes from 'prop-types';
 import styled from 'styled-components';
 
-export const Modal = ({ handleToggleModal, ImageURL }) => {
+export const Modal = ({ closeModal, ImageURL }) => {
   useEffect(() => {
     const handleKeyDown = e => {
       if (e.key === 'Escape') {
-        handleToggleModal();
+        closeModal();
       }
     };
 
@@ -14,11 +14,11 @@ export const Modal = ({ handleToggleModal, ImageURL }) => {
     return () => {
       window.removeEventListener('keydown', handleKeyDown);
     };
-  }, [handleToggleModal]);
+  }, [closeModal]);
 
   const onBackdropClick = e => {
     if (e.target === e.currentTarget) {
-      handleToggleModal();
+      closeModal();
     }
   };
 
@@ -26,7 +26,7 @@ export const Modal = ({ handleToggleModal, ImageURL }) => {
     <ModalWrapper onClick={onBackdropClick}>
       <StyledModalWindow>
         <StyledWrapper>
-          <button onClick={handleToggleModal}>X</button>
+          <button onClick={closeModal}>X</button>
 
           <div>
             {' '}
@@ -44,7 +44,7 @@ export const Modal = ({ handleToggleModal, ImageURL }) => {
 };
 
 Modal.propTypes = {
-  handleToggleModal: PropTypes.func.isRequired,
+  closeModal: PropTypes.func.isRequired,
   largeImageURL: PropTypes.string.isRequired,
 };
 

@@ -10,17 +10,13 @@ import { Searchbar } from './Searchbar';
 import { Modal } from './Modal';
 
 export const App = () => {
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState(null);
-  const [images, setImages] = useState([]);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [largeImageURL, setlargeImageURL] = useState('');
   const [page, setPage] = useState(1);
-  const [per_page, setPer_page] = useState(12);
-  const [query, setQuery] = useState('');
-  const [totalHits, setTotalHits] = useState(0);
-  const [isModalOpen, setIsModalOpen] = useState(false);
-  const [total, setTotal] = useState('');
-  const [imageURL, setImageURL] = useState(null);
-
+  const [per_page] = useState(12);
+  const [images, setImages] = useState([]);
+  const [showloadMore, setShowloadMore] = useState(false);
+  const [showLoader, setShowLoader] = useState(false);
   const firstLoadOf = useRef(true);
 
   useEffect(() => {
@@ -28,68 +24,66 @@ export const App = () => {
       firstLoadOf.current = false;
       return;
     }
-    const nextFetch = async () => {
-      setLoading(true);
+    const newFeach = async () => {
       try {
-        const data = await fetchImages({ page, per_page, q: query });
-
+        setShowloadMore(false);
+        setShowLoader(true);
+        const data = await fetchImages({ page, per_page, q: searchQuery });
+        if (!data.totalHits) {
+          toast.warn(
+            'Sorry, but nothing was found for your request. Change the request and try again.'
+          );
+          return;
+        }
         setImages(prevImages =>
           page === 1 ? data.hits : [...prevImages, ...data.hits]
+        );
+        setShowloadMore(
+          page === Math.ceil(data.totalHits / per_page) ? false : true
         );
       } catch (error) {
         toast.error('Oops!!! An error occurred. Please try again.');
       } finally {
-        setLoading(false);
+        setShowLoader(false);
       }
     };
-    nextFetch();
-  }, [query, page, per_page]);
-
-  const handleSearchInput = q => {
-    if (query !== q) {
-      setQuery(q);
+    newFeach();
+  }, [searchQuery, page, per_page]);
+  const handleSearchForm = query => {
+    if (!query) {
+      toast.warn('Please enter a request!');
+      return;
+    }
+    if (searchQuery !== query) {
+      setImages([]);
+      setSearchQuery(query);
       setPage(1);
     }
   };
-
-  // const handleSubmit = () => {
-  //   setImages([]), setPage(1), setTotalHits(0);
-  //   // this.setState({ images: [], page: 1, totalHits: 0 });
-  // };
-
   const handleLoadMore = () => {
-    const maxPages = Math.ceil(totalHits / per_page);
-    setPage(page < maxPages ? page + 1 : page);
+    setPage(prev => prev + 1);
   };
-
-  const handleToggleModal = imageURL => {
-    setImageURL(imageURL ? imageURL : '');
+  const handleShowBigImg = url => {
+    setlargeImageURL(url);
   };
-
+  const closeModal = () => {
+    setlargeImageURL('');
+  };
   return (
-    <div
-      style={{
-        display: 'flex',
-        flexDirection: 'column',
-        alignItems: 'center',
-        fontSize: 18,
-        color: `#000000`,
-      }}
-    >
-      <header>
-        <Searchbar onSubmit={handleSearchInput} />
-      </header>
-      {loading && !images ? (
+    <>
+      <Searchbar onSubmit={handleSearchForm} />
+      {showLoader && !images ? (
         <Loader />
       ) : (
-        <ImageGallery handleToggleModal={handleToggleModal} images={images} />
+        <ImageGallery images={images} onShowBigImg={handleShowBigImg} />
       )}
-      {totalHits > images.length ? (
-        <Button onClick={handleLoadMore} loading={loading} />
-      ) : null}
-      {isModalOpen ? (
-        <Modal handleToggleModal={handleToggleModal} largeImageURL={imageURL} />
-      ) : null}
-    </div>
+
+      {showloadMore && <Button onLoadMore={handleLoadMore} />}
+      {largeImageURL && (
+        <Modal closeModal={closeModal}>
+          <img src={largeImageURL} alt="Img pixabay" />
+        </Modal>
+      )}
+    </>
   );
 };
