@@ -5,12 +5,12 @@ import PropTypes from 'prop-types';
 export const ImageGalleryItem = ({
   webformatURL,
   largeImageURL,
-  handleToggleModal,
+  onShowBigImg,
 }) => {
   return (
     <StyledItem>
       <StyledImg
-        onClick={() => handleToggleModal(largeImageURL)}
+        onClick={() => onShowBigImg(largeImageURL)}
         src={webformatURL}
         alt={'img pixabay'}
         width={200}
@@ -22,7 +22,7 @@ export const ImageGalleryItem = ({
 ImageGalleryItem.propTypes = {
   largeImageURL: PropTypes.string.isRequired,
   webformatURL: PropTypes.string.isRequired,
-  handleToggleModal: PropTypes.func.isRequired,
+  onShowBigImg: PropTypes.func.isRequired,
 };
 
 const StyledItem = styled.li`

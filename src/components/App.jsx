@@ -49,6 +49,7 @@ export const App = () => {
     };
     newFeach();
   }, [searchQuery, page, per_page]);
+
   const handleSearchForm = query => {
     if (!query) {
       toast.warn('Please enter a request!');
@@ -80,9 +81,7 @@ export const App = () => {
 
       {showloadMore && <Button onLoadMore={handleLoadMore} />}
       {largeImageURL && (
-        <Modal closeModal={closeModal}>
-          <img src={largeImageURL} alt="Img pixabay" />
-        </Modal>
+        <Modal closeModal={closeModal} ImageURL={largeImageURL} />
       )}
     </>
   );

@@ -3,12 +3,12 @@ import { ImageGalleryItem } from './ImageGalleryItem';
 import styled from 'styled-components';
 import PropTypes from 'prop-types';
 
-export const ImageGallery = ({ images = [], handleToggleModal }) => {
+export const ImageGallery = ({ images = [], onShowBigImg }) => {
   return (
     <StyledList>
       {images.map(image => (
         <ImageGalleryItem
-          handleToggleModal={handleToggleModal}
+          onShowBigImg={onShowBigImg}
           key={image.id}
           {...image}
         />
@@ -25,7 +25,7 @@ ImageGallery.propTypes = {
       webformatURL: PropTypes.string.isRequired,
     })
   ).isRequired,
-  handleToggleModal: PropTypes.func.isRequired,
+  onShowBigImg: PropTypes.func.isRequired,
 };
 
 const StyledList = styled.ul`

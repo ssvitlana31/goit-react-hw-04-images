@@ -2,17 +2,17 @@ import React from 'react';
 import styled from 'styled-components';
 import PropTypes from 'prop-types';
 
-export const Button = ({ loading, onClick }) => {
+export const Button = ({ loading, onLoadMore }) => {
   return (
-    <StyledButton onClick={onClick}>
+    <StyledButton onClick={onLoadMore}>
       {!loading ? 'Load more' : 'Loading...'}
     </StyledButton>
   );
 };
 
 Button.propTypes = {
-  onClick: PropTypes.func.isRequired,
-  loading: PropTypes.bool.isRequired,
+  onLoadMore: PropTypes.func.isRequired,
+  loading: PropTypes.bool,
 };
 
 export const StyledButton = styled.button`

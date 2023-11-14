@@ -45,7 +45,7 @@ export const Modal = ({ closeModal, ImageURL }) => {
 
 Modal.propTypes = {
   closeModal: PropTypes.func.isRequired,
-  largeImageURL: PropTypes.string.isRequired,
+  ImageURL: PropTypes.string.isRequired,
 };
 
 const ModalWrapper = styled.div`
